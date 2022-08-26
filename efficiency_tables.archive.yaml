@@ -1,0 +1,131 @@
+definitions:
+  name: 'Solar cell schema'
+  sections:
+    SolarCell:
+      # Important: must inherit from both, ElnBaseSection and TableRow
+      # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
+      # do some work in the backgroud, like parsing the values, making quantities serachable and copying
+      # values to our `Results` section, where all the entries become interoperable.
+      base_sections: 
+        # - 'nomad.datamodel.data.EntryData'
+        - nomad.datamodel.metainfo.eln.ElnBaseSection
+        - nomad.parsing.tabular.TableRow
+      m_annotations:
+        eln: 
+          hide: ['name', 'lab_id'] # We want to hide some quantities defined in ElnBaseSection in our forms.
+      quantities:
+        description:
+          type: str
+          m_annotations:
+            tabular:
+              name: Institutions and Comments
+            eln:
+              component: RichTextEditQuantity
+      sub_sections:
+        publication_reference:
+          section:
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.PublicationReference'
+              - 'nomad.parsing.tabular.TableRow'
+            quantities:
+              DOI_number:
+                type: str
+                m_annotations:
+                  tabular:
+                    name: doi
+                  eln:
+                    component: StringEditQuantity
+        solar_cell_definition:
+          section:
+            base_section: nomad.datamodel.metainfo.eln.SolarCellDefinition
+            quantities:
+              stack_sequence:
+                type: str
+                # shape: ['*']  # Shapes define non scalar values, like lists ['*'], vectors ['*', 3], etc.
+                m_annotations:
+                  tabular:
+                    name: Device structure
+                  eln:
+                    component: StringEditQuantity
+              solar_cell_area:
+                type: np.float64
+                unit: cm**2
+                m_annotations:
+                  tabular:
+                    name: Area (cm2)
+                  eln:
+                    component: NumberEditQuantity
+        solar_cell_parameters:
+          section:
+            base_section: nomad.datamodel.metainfo.eln.SolarCellJVCurve
+            quantities:
+              open_circuit_voltage:
+                type: np.float64
+                unit: V
+                m_annotations:
+                  tabular:
+                    name: VOC (V)
+                  eln:
+                    component: NumberEditQuantity
+              short_circuit_current_density:
+                type: np.float64
+                unit: mA/cm**2
+                m_annotations:
+                  tabular:
+                    name: JSC (mA cm−2)
+                  eln:
+                    component: NumberEditQuantity          
+              fill_factor:
+                type: np.float64
+                m_annotations:
+                  tabular:
+                    name: FF  
+                  eln:
+                    component: NumberEditQuantity
+              efficiency:
+                type: np.float64
+                m_annotations:
+                  tabular:
+                    name: Eff. (%)  
+                  eln:
+                    component: NumberEditQuantity
+        absorber_layer:
+          section:
+            # Below we inherit from 3 base sections. The Chemical base section adds the
+            # base ELN quantities ['name', 'lab_id', 'description'] that we decide to hide 
+            # and a quantity called `chemical_formula`. `chemical formula` is a quantity in which 
+            # a valid chemical formula gets parsed to make the entry searchable by elements and different 
+            # formulae represetantions. The rule here is to introduce formulas which are
+            # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
+            # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.  
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.Chemical'
+              - 'nomad.datamodel.metainfo.eln.SolarCellBaseSectionWithOptoelectronicProperties'
+              - 'nomad.datamodel.metainfo.eln.SolarCellLayer'
+            # base_section: nomad.datamodel.metainfo.eln.Chemical
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id', 'description']
+            quantities:
+              chemical_formula:
+                type: str
+                m_annotations:
+                  tabular:
+                    name: Formula 
+                  eln:
+                    component: StringEditQuantity
+              layer_name:
+                type: str
+                m_annotations:
+                  tabular:
+                    name: Material
+                  eln:
+                    component: StringEditQuantity
+              bandgap:
+                type: np.float64
+                unit: eV
+                m_annotations:
+                  tabular:
+                    name: Eg (eV)
+                  eln:
+                    component: NumberEditQuantity
