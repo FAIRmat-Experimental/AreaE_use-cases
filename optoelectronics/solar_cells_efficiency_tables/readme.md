@@ -11,7 +11,8 @@ In the data schema (yaml file), we can define a table parser inheriting the `bas
 This allow us to populate the nomad data schema from an [excel file](https://github.com/FAIRmat-Experimental/AreaE_use-cases/blob/main/optoelectronics/solar_cells_efficiency_tables/efficiency_tables.archive.xlsx), just by telling from which column we want to populate a the nomad 
 quantity that we define in our [yaml schema](https://github.com/FAIRmat-Experimental/AreaE_use-cases/blob/main/optoelectronics/solar_cells_efficiency_tables/efficiency_tables.archive.yaml)
 
-Below we show that in the `sub_section` `publication_reference`, there is a nomad `quantity` called `DOI_number`
+Below there is a snapshot of the [yaml schema](https://github.com/FAIRmat-Experimental/AreaE_use-cases/blob/main/optoelectronics/solar_cells_efficiency_tables/efficiency_tables.archive.yaml).  
+We show that in the `sub_section`: `publication_reference`, there is a nomad `quantity` called `DOI_number`
 which will get populated from the column called *doi* in the excel file.  
   
 	
