@@ -1,0 +1,21 @@
+definitions:
+  name: 'Bulk modulus DiSCoVeR predicted materials'
+  sections:
+    DiSCoVeRBulkModulus:
+      # Important: must inherit from both, ElnBaseSection and TableRow
+      # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
+      # do some work in the backgroud, like parsing the values, making quantities serachable and copying
+      # values to our `Results` section, where all the entries become interoperable.
+      base_sections: 
+        # - 'nomad.datamodel.data.EntryData'
+        - 'nomad.datamodel.metainfo.eln.Chemical'
+        - 'nomad.datamodel.data.EntryData'
+        # - nomad.datamodel.results.BulkModulus
+ # We want to hide some quantities defined in ElnBaseSection in our forms.
+      quantities:
+        value:
+          type: np.float64
+          unit: Pa
+          m_annotations:
+            eln:
+              component: NumberEditQuantity
