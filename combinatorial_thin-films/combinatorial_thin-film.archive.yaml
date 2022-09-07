@@ -1,0 +1,12 @@
+definitions:
+  name: 'Combinatorial thin-film'
+  sections:
+    SampleID:
+      base_sections:
+        - 'nomad.datamodel.metainfo.eln.SampleID'
+        - 'nomad.datamodel.data.EntryData'
+      m_annotations:
+        template: 
+        eln: 
+          # hide: ['children', 'parents', institute]
+          hide: []
