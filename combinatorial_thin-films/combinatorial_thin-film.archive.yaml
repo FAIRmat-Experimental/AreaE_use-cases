@@ -1,7 +1,7 @@
 definitions:
   name: 'Combinatorial thin-film'
   sections:
-    SampleID:
+    CombinatorialThinFilm:
       base_sections:
         - 'nomad.datamodel.metainfo.eln.SampleID'
         - 'nomad.datamodel.data.EntryData'
