@@ -1,12 +1,47 @@
 definitions:
-  name: 'Combinatorial thin-film'
+  name: Combinatorial thin-film
   sections:
+    Activity:
+      base_sections:
+        - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
+    Measurement:
+      base_sections:
+        - Activity
+    Process:
+      base_sections:
+        - Activity
+    XRFMeasurement:
+      base_sections:
+        - Activity
+        - nomad.datamodel.metainfo.eln.Measurement
+        - Measurement
+        - nomad.datamodel.data.EntryData
+      quantities:
+        tube_voltage:
+          description: |
+            The excitation voltage of the X-ray tube used for the measurement.
+          type: float
+          m_annotations:
+            eln:
+              component: NumberEditQuantity
+    PVDProcess:
+      base_sections:
+        - Activity
+        - nomad.datamodel.metainfo.eln.Process
+        - Process
+        - nomad.datamodel.data.EntryData
     CombinatorialThinFilm:
       base_sections:
-        - 'nomad.datamodel.metainfo.eln.SampleID'
-        - 'nomad.datamodel.data.EntryData'
+        - nomad.datamodel.metainfo.eln.SampleID
+        - nomad.datamodel.data.EntryData
       m_annotations:
         template: 
         eln: 
-          # hide: ['children', 'parents', institute]
           hide: []
+      quantities:
+        sample_history:
+          type: Activity
+          shape: ['*']
+          m_annotations:
+            eln:
+              component: ReferenceEditQuantity
