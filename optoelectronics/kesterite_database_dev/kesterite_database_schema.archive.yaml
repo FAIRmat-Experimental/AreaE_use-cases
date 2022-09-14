@@ -1,0 +1,360 @@
+definitions:
+  name: 'Kesterite Database Entry v0p3'
+  sections:
+    KesteriteSample:
+      # Important: must inherit from both, ElnBaseSection and TableRow
+      # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
+      # do some work in the backgroud, like parsing the values, making quantities serachable and copying
+      # values to our `Results` section, where all the entries become interoperable.
+      base_sections: 
+        - nomad.datamodel.metainfo.eln.ElnBaseSection
+        - nomad.parsing.tabular.TableRow
+        - nomad.datamodel.metainfo.eln.SampleID
+        - 'nomad.datamodel.data.EntryData'
+      m_annotations:
+        eln: 
+          hide: ['name', 'lab_id', 'children', 'parents'] # We want to hide some quantities defined in ElnBaseSection in our forms.
+      quantities:
+        description:
+          type: str
+          m_annotations:
+            tabular:
+              name: Institutions and Comments
+            eln:
+              component: RichTextEditQuantity
+        status:
+          type:
+            type_kind: Enum
+            type_data:
+              - planned
+              - in preparation
+              - fully prepared
+              - published
+          description: |
+                        Current status of the sample.
+          m_annotations:
+            eln:
+              component: RadioEnumEditQuantity
+      sub_sections:
+        precursor_layer:
+          repeats: true
+          section:
+            m_annotations:
+              eln: 
+                hide: ['layer_name', 'solar_cell_layer_type']
+            quantities:
+              precursor_deposition_method:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+                    # component: EnumEditQuantity
+                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOES']
+              chemical_formula:
+                type: str
+                description: |+
+                  Chemical formula stating the absorber layer composition.
+                  
+                  Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              Layer_thickness:
+                type: np.float64
+                unit: nm
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "nm"
+              composition_quantification_method:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+                    # component: EnumEditQuantity
+                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOS']
+        absorber_layer:
+          section:
+            # Below we inherit from 2 base sections. The Chemical base section adds the
+            # base ELN quantities ['name', 'lab_id', 'description'] that we decide to hide 
+            # and a quantity called 'chemical_formula'. 'chemical formula' is a quantity in which 
+            # a valid chemical formula gets parsed to make the entry searchable by elements and different 
+            # formulae represetantions. The rule here is to introduce formulas which are
+            # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
+            # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.  
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.Chemical'
+              - 'nomad.datamodel.metainfo.eln.SolarCellLayer'
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id', 'description', 'layer_name', 'bandgap', 'solar_cell_layer_type']
+            sub_sections:
+              chalcogenization_details:
+                section:
+                  quantities:
+                    type_of_setup:
+                      description: |
+                                    Type of machine in which the chalcogenization is conducted.
+                      type:
+                        type_kind: Enum
+                        type_data:
+                          - Tube furnace
+                          - RTP
+                          - dedicated vavacuum chamber
+                          - other
+                      m_annotations:
+                        eln:
+                          component: RadioEnumEditQuantity
+                    recipient_material:
+                      description: |
+                                    Material of the recipient in which the chalcogenization is conducted.
+                      type:
+                        type_kind: Enum
+                        type_data:
+                          - Graphite
+                          - Quartz
+                          - other
+                      m_annotations:
+                        eln:
+                          component: RadioEnumEditQuantity
+                    recipient_mass:
+                      description: |
+                                      Mass of the recipient in which the chalcogenization is conducted.
+                      type: np.float64
+                      unit: g
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "g"
+                    recipient_inner_volume:
+                      description: |
+                                      Volume of atmosphere/air inside the closed recipient with the sample placed inside.
+                      type: np.float64
+                      unit: cm^3
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "cm^3"
+                    recipient_closed_with_screws?:
+                      description: |
+                                    Was the lid of the recipient closed with bolts/screws?
+                      type: bool
+                      m_annotations:
+                        eln:
+                          component: BoolEditQuantity
+                    selenium_mass:
+                      description: |
+                                      Ammount of selenium inserted into the recipient for chalcogenization.
+                      type: np.float64
+                      unit: g
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "g"
+                    tin_mass:
+                      description: |
+                                      Ammount of tin inserted into the recipient for chalcogenization.
+                      type: np.float64
+                      unit: g
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "g"
+                  sub_sections:
+                    temperature_steps:
+                      repeats: true
+                      section:
+                        quantities:
+                          temperature:
+                            description: |
+                                            Final temperature of that step.
+                            type: np.float64
+                            unit: °C
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "°C"
+                          dwell_time:
+                            description: |
+                                            Time spent at the given temperature after reaching it.
+                            type: np.float64
+                            unit: s
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "s"
+                          temperature_ramp:
+                            description: |
+                                            Rate of temperature increase/decrease to reach the final temperature of this stage.
+                            type: np.float64
+                            unit: K/minute
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "K/minute"
+                          atmosphere:
+                            type:
+                              type_kind: Enum
+                              type_data:
+                                - N2
+                                - Ar
+                                - vacuum
+                                - other
+                            description: |
+                                          Atmosphere in the recipient during this step.
+                            m_annotations:
+                              eln:
+                                component: RadioEnumEditQuantity
+                          pressure:
+                            description: |
+                                            Pressure in the recipient during this step.
+                            type: np.float64
+                            unit: hPa
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "hPa"
+            quantities:
+              chemical_formula:
+                type: str
+                description: |+
+                  Chemical formula stating the absorber layer composition.
+                  
+                  Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+                m_annotations:
+                  tabular:
+                    name: Formula 
+                  eln:
+                    component: StringEditQuantity
+              composition_quantification_method:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+                    # component: EnumEditQuantity
+                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOS']
+
+
+                      
+        optoelectronic_properties:
+          section:
+            base_sections:
+              - 'nomad.datamodel.metainfo.eln.SolarCellBaseSectionWithOptoelectronicProperties'
+            quantities:
+              bandgap_estimation_basis:
+                type: str
+                description: |
+                        Lorem ipsum
+                m_annotations:
+                  tabular:
+                    name: Device structure
+                  eln:
+                    component: StringEditQuantity
+              doping:
+                type: np.float64
+                unit: cm^-3
+                description: |
+                        Lorem ipsum
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: cm^-3
+              doping_estimation_basis:
+                type: str
+                description: |
+                        Lorem ipsum
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              lifetime:
+                type: np.float64
+                unit: s
+                description: |
+                        Lorem ipsum
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: ns
+              lifetime_estimation_basis:
+                type: str
+                description: |
+                        Lorem ipsum
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+        solar_cell_parameters:
+          section:
+            base_sections:
+              - nomad.datamodel.metainfo.eln.SolarCellJVCurve
+              - nomad.datamodel.metainfo.eln.SolarCellDefinition
+            m_annotations:
+              eln: 
+                hide: ['architecture', 'stack_sequence', 'current_density', 'voltage']
+            quantities:
+              stack_sequence:
+                type: str
+                description: |
+                        Sequence of the stack starting with the substrate, separated by '/'. e.g. Glass/Mo/CZTSe/CdS/ZnO/Ag
+                m_annotations:
+                  tabular:
+                    name: Device structure
+                  eln:
+                    component: StringEditQuantity
+              solar_cell_area:
+                type: np.float64
+                unit: cm**2
+                m_annotations:
+                  tabular:
+                    name: Area (cm2)
+                  eln:
+                    component: NumberEditQuantity
+              open_circuit_voltage:
+                type: np.float64
+                unit: V
+                m_annotations:
+                  tabular:
+                    name: VOC (V)
+                  eln:
+                    component: NumberEditQuantity
+              short_circuit_current_density:
+                type: np.float64
+                unit: mA/cm**2
+                m_annotations:
+                  tabular:
+                    name: JSC (mA cm−2)
+                  eln:
+                    component: NumberEditQuantity          
+              fill_factor:
+                type: np.float64
+                m_annotations:
+                  tabular:
+                    name: FF  
+                  eln:
+                    component: NumberEditQuantity
+                    minValue: 0
+                    maxValue: 1
+              efficiency:
+                type: np.float64
+                m_annotations:
+                  tabular:
+                    name: Eff. (%)  
+                  eln:
+                    component: NumberEditQuantity
+            sub_sections:
+              EQE:
+                section:
+                  base_sections:
+                    - nomad.datamodel.metainfo.eln.SolarCellEQE
+                  
+        publication_reference:
+          section:
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.PublicationReference'
+            quantities:
+              DOI_number:
+                type: str
+                m_annotations:
+                  tabular:
+                    name: doi
+                  eln:
+                    component: StringEditQuantity
