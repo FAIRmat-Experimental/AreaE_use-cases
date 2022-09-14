@@ -33,19 +33,19 @@ definitions:
         solar_cell_definition:
           section:
             base_section: nomad.datamodel.metainfo.eln.SolarCellDefinition
-            quantities:
-              stack_sequence:
-                type: str
-                # shape: ['*']  # Shapes define non scalar values, like lists ['*'], vectors ['*', 3], etc.
-                m_annotations:
-                  eln:
-                    component: StringEditQuantity
-              solar_cell_area:
-                type: np.float64
-                unit: cm**2
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
+            # quantities:
+              # stack_sequence:
+              #   type: str
+              #   shape: ['*']  # Shapes define non scalar values, like lists ['*'], vectors ['*', 3], etc.
+              #   m_annotations:
+              #     eln:
+              #       component: StringEditQuantity
+              # solar_cell_area:
+              #   type: np.float64
+              #   unit: cm**2
+              #   m_annotations:
+              #     eln:
+              #       component: NumberEditQuantity
         solar_cell_parameters:
           section:
             base_sections: 
@@ -160,9 +160,16 @@ definitions:
                   eln:
                     component: StringEditQuantity   
               #TODO check why multiple inheritance breaks here and it does normalize the formulas with the quantity below
-              # solar_cell_layer_type:
+              solar_cell_layer_type:
+                type: str  # The simple string type
+                default: Absorber
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity  # A simple text edit form field
+              # layer_name:
               #   type: str  # The simple string type
-              #   default: Absorber
+              #   shape: ['0..*']  # The simple string type
+              #   default: MyAbsorber
               #   m_annotations:
               #     eln:
               #       component: StringEditQuantity  # A simple text edit form field

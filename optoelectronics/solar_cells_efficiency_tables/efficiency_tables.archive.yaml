@@ -24,9 +24,7 @@ definitions:
       sub_sections:
         publication_reference:
           section:
-            base_sections: 
-              - 'nomad.datamodel.metainfo.eln.PublicationReference'
-              # - 'nomad.parsing.tabular.TableRow'
+            base_section: nomad.datamodel.metainfo.eln.PublicationReference
             quantities:
               DOI_number:
                 type: str
@@ -114,13 +112,13 @@ definitions:
                     name: Formula 
                   eln:
                     component: StringEditQuantity   
-              #TODO check why multiple inheritance breaks here and it does normalize the formulas with the quantity below
-              # solar_cell_layer_type:
-              #   type: str  # The simple string type
-              #   default: Absorber
-              #   m_annotations:
-              #     eln:
-              #       component: StringEditQuantity  # A simple text edit form field
+              # TODO check why multiple inheritance breaks here and it does normalize the formulas with the quantity below
+              solar_cell_layer_type:
+                type: str  # The simple string type
+                default: Absorber
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity  # A simple text edit form field
               layer_name:
                 type: str
                 m_annotations:
