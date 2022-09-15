@@ -1,5 +1,5 @@
 definitions:
-  name: 'Kesterite Database Entry v0p3'
+  name: 'Kesterite Database Entry v0p4'
   sections:
     KesteriteSample:
       # Important: must inherit from both, ElnBaseSection and TableRow
@@ -36,6 +36,27 @@ definitions:
             eln:
               component: RadioEnumEditQuantity
       sub_sections:
+        substrate_and_backcontact:
+          section:
+            quantities:
+                substrate_material:
+                  type: str
+                  m_annotations:
+                    eln:
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - quartz
+                          - SLG
+                          - stainless steel
+                substrate_supplier:
+                  type: str
+                  m_annotations:
+                    eln:
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Saint Gobain
         precursor_layer:
           repeats: true
           section:
@@ -47,9 +68,13 @@ definitions:
                 type: str
                 m_annotations:
                   eln:
-                    component: StringEditQuantity
-                    # component: EnumEditQuantity
-                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOES']
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - PVD / Co-Evaporation
+                        - DC sputtering
+                        - AC sputtering
+                        - Solution based
               chemical_formula:
                 type: str
                 description: |+
@@ -70,9 +95,17 @@ definitions:
                 type: str
                 m_annotations:
                   eln:
-                    component: StringEditQuantity
-                    # component: EnumEditQuantity
-                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOS']
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Deposition Parameters
+                          - XRF
+                          - XPS
+                          - EDX
+                          - GDOES
+                          - ICP-MS
+                          - WDX
+                          - RBS
         absorber_layer:
           section:
             # Below we inherit from 2 base sections. The Chemical base section adds the
@@ -113,7 +146,6 @@ definitions:
                         type_data:
                           - Graphite
                           - Quartz
-                          - other
                       m_annotations:
                         eln:
                           component: RadioEnumEditQuantity
@@ -230,12 +262,17 @@ definitions:
                 type: str
                 m_annotations:
                   eln:
-                    component: StringEditQuantity
-                    # component: EnumEditQuantity
-                    # suggestions: ['Deposition Parameters', 'XRF', 'XPS', 'EDX', 'GDOS']
-
-
-                      
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Deposition Parameters
+                          - XRF
+                          - XPS
+                          - EDX
+                          - GDOES
+                          - ICP-MS
+                          - WDX
+                          - RBS
         optoelectronic_properties:
           section:
             base_sections:
@@ -244,17 +281,21 @@ definitions:
               bandgap_estimation_basis:
                 type: str
                 description: |
-                        Lorem ipsum
+                        Measurement or technique used to determine the bandgap value.
                 m_annotations:
                   tabular:
                     name: Device structure
                   eln:
-                    component: StringEditQuantity
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - Tauc plot
+                        - EQE-derivative
               doping:
                 type: np.float64
                 unit: cm^-3
-                description: |
-                        Lorem ipsum
+                # description: |
+                #         Doping level.
                 m_annotations:
                   eln:
                     component: NumberEditQuantity
@@ -262,15 +303,20 @@ definitions:
               doping_estimation_basis:
                 type: str
                 description: |
-                        Lorem ipsum
+                        Measurement or technique used to determine the doping.
                 m_annotations:
                   eln:
-                    component: StringEditQuantity
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - Capacitance-Voltage
+                        - Hall effect
+                        - Photohall effect
               lifetime:
                 type: np.float64
                 unit: s
-                description: |
-                        Lorem ipsum
+                # description: |
+                #         Lorem ipsum
                 m_annotations:
                   eln:
                     component: NumberEditQuantity
@@ -278,73 +324,204 @@ definitions:
               lifetime_estimation_basis:
                 type: str
                 description: |
-                        Lorem ipsum
+                        Measurement or technique used to determine the lifetime.
                 m_annotations:
                   eln:
-                    component: StringEditQuantity
-        solar_cell_parameters:
-          section:
-            base_sections:
-              - nomad.datamodel.metainfo.eln.SolarCellJVCurve
-              - nomad.datamodel.metainfo.eln.SolarCellDefinition
-            m_annotations:
-              eln: 
-                hide: ['architecture', 'stack_sequence', 'current_density', 'voltage']
-            quantities:
-              stack_sequence:
-                type: str
-                description: |
-                        Sequence of the stack starting with the substrate, separated by '/'. e.g. Glass/Mo/CZTSe/CdS/ZnO/Ag
-                m_annotations:
-                  tabular:
-                    name: Device structure
-                  eln:
-                    component: StringEditQuantity
-              solar_cell_area:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - TRPL
+              PLQY:
                 type: np.float64
-                unit: cm**2
+                description: |
+                        Photoluminescence Quantum Yield.
                 m_annotations:
-                  tabular:
-                    name: Area (cm2)
                   eln:
                     component: NumberEditQuantity
+                    minValue: 0
+                    maxValue: 1
+              PLQY_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the photoluminescence quantum yield.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - absolute calibrated PL
+              QFLS:
+                type: np.float64
+                unit: eV
+                description: |
+                        Quasi Fermi Level Splitting.
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: eV
+              QFLS_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the quasi fermi level splitting.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - absolute calibrated PLQY
+                        - SPV
+            sub_sections:
+              EQE:
+                section:
+                  base_sections:
+                    - nomad.datamodel.metainfo.eln.SolarCellEQE
+                  m_annotations:
+                    # We can use the eln annotations to put the section to the overview
+                    # page, and hide unwanted inherited quantities.
+                    eln:
+                      overview: true
+                    # Plots are shown in the eln. Currently we only support simple x,y
+                    # line plots
+                    plot:
+                      title: Extenral quantum efficiency (EQE)
+                      x: raw_wavelength_array
+                      y: raw_eqe_array
+        
+        solar_cell_parameters:
+          section:
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
+              - 'nomad.parsing.tabular.TableData'
+            m_annotations:
+              # We can use the eln annotations to put the section to the overview
+              # page, and hide unwanted inherited quantities.
+              eln:
+                overview: true
+                hide: ['potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'series_resistance', 'shunt_resistance']
+              # Plots are shown in the eln. Currently we only support simple x,y
+              # line plots
+              plot:
+                title: J-V curve
+                x: voltage
+                y: current_density
+            quantities:
+              data_file:
+                type: str
+                description: |
+                  A reference to an uploaded .csv produced by the PVD evaporation instruments
+                  control software.
+                m_annotations:
+                  # The tabular_parser annotation, will treat the values of this
+                  # quantity as files. It will try to interpret the files and fill
+                  # quantities in this section (and sub_section) with the column
+                  # data of .csv or .xlsx files.
+                  tabular_parser:
+                    # sep: '\t'
+                    comment: '#'
+                  browser:
+                    adaptor: RawFileAdaptor  # Allows to navigate to files in the data browser
+                  eln:
+                    component: FileEditQuantity  # A form field that allows to drop and select files.
+              current_density:
+                type: np.float64
+                shape: ['*']
+                unit: mA/cm**2
+                m_annotations:
+                  # The tabular annotation defines a mapping to column headers used in
+                  # tabular data files
+                  tabular:
+                    name: j_sc
+              voltage:
+                type: np.float64
+                shape: ['*']
+                unit: V
+                m_annotations:
+                  tabular:
+                    name: Voltage
+                  plot:
+                    x: voltage
+                    y: current_density
               open_circuit_voltage:
                 type: np.float64
                 unit: V
                 m_annotations:
-                  tabular:
-                    name: VOC (V)
                   eln:
                     component: NumberEditQuantity
               short_circuit_current_density:
                 type: np.float64
                 unit: mA/cm**2
                 m_annotations:
-                  tabular:
-                    name: JSC (mA cm−2)
                   eln:
                     component: NumberEditQuantity          
               fill_factor:
                 type: np.float64
                 m_annotations:
-                  tabular:
-                    name: FF  
                   eln:
                     component: NumberEditQuantity
-                    minValue: 0
-                    maxValue: 1
               efficiency:
                 type: np.float64
                 m_annotations:
-                  tabular:
-                    name: Eff. (%)  
                   eln:
                     component: NumberEditQuantity
-            sub_sections:
-              EQE:
-                section:
-                  base_sections:
-                    - nomad.datamodel.metainfo.eln.SolarCellEQE
+
+        # solar_cell_parameters:
+        #   section:
+        #     base_sections:
+        #       - nomad.datamodel.metainfo.eln.SolarCellJVCurve
+        #       - nomad.datamodel.metainfo.eln.SolarCellDefinition
+        #     m_annotations:
+        #       eln: 
+        #         hide: ['architecture', 'stack_sequence', 'current_density', 'voltage']
+        #     quantities:
+        #       stack_sequence:
+        #         type: str
+        #         description: |
+        #                 Sequence of the stack starting with the substrate, separated by '/'. e.g. Glass/Mo/CZTSe/CdS/ZnO/Ag
+        #         m_annotations:
+        #           tabular:
+        #             name: Device structure
+        #           eln:
+        #             component: StringEditQuantity
+        #       solar_cell_area:
+        #         type: np.float64
+        #         unit: cm**2
+        #         m_annotations:
+        #           tabular:
+        #             name: Area (cm2)
+        #           eln:
+        #             component: NumberEditQuantity
+        #       open_circuit_voltage:
+        #         type: np.float64
+        #         unit: V
+        #         m_annotations:
+        #           tabular:
+        #             name: VOC (V)
+        #           eln:
+        #             component: NumberEditQuantity
+        #       short_circuit_current_density:
+        #         type: np.float64
+        #         unit: mA/cm**2
+        #         m_annotations:
+        #           tabular:
+        #             name: JSC (mA cm−2)
+        #           eln:
+        #             component: NumberEditQuantity          
+        #       fill_factor:
+        #         type: np.float64
+        #         m_annotations:
+        #           tabular:
+        #             name: FF  
+        #           eln:
+        #             component: NumberEditQuantity
+        #             minValue: 0
+        #             maxValue: 1
+        #       efficiency:
+        #         type: np.float64
+        #         m_annotations:
+        #           tabular:
+        #             name: Eff. (%)  
+        #           eln:
+        #             component: NumberEditQuantity
                   
         publication_reference:
           section:
