@@ -6,14 +6,20 @@ definitions:
       # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
       # do some work in the backgroud, like parsing the values, making quantities serachable and copying
       # values to our `Results` section, where all the entries become interoperable.
+
       base_sections: 
         - nomad.datamodel.metainfo.eln.ElnBaseSection
         - nomad.parsing.tabular.TableRow
         - nomad.datamodel.metainfo.eln.SampleID
-        - 'nomad.datamodel.data.EntryData'
+        - nomad.datamodel.data.EntryData
+      # description: |
+      #   This is an example description for Chemical.
       m_annotations:
         eln: 
           hide: ['name', 'lab_id', 'children', 'parents'] # We want to hide some quantities defined in ElnBaseSection in our forms.
+          # description: |
+          #           This is an entry describing one Kesterite sample. The information for the sample may be added gradually and editted or completed at a later point. 
+      
       quantities:
         description:
           type: str
@@ -22,6 +28,7 @@ definitions:
               name: Institutions and Comments
             eln:
               component: RichTextEditQuantity
+        
         status:
           type:
             type_kind: Enum
@@ -35,28 +42,112 @@ definitions:
           m_annotations:
             eln:
               component: RadioEnumEditQuantity
+      
       sub_sections:
-        substrate_and_backcontact:
+        sample_stack:
           section:
+            base_sections:
+              - nomad.datamodel.metainfo.eln.SolarCellDefinition
+            m_annotations:
+              eln: 
+                hide: ['architecture', 'solar_cell_area']
             quantities:
-                substrate_material:
-                  type: str
-                  m_annotations:
-                    eln:
-                      component: EnumEditQuantity
-                      props:
-                        suggestions:
-                          - quartz
-                          - SLG
-                          - stainless steel
-                substrate_supplier:
-                  type: str
-                  m_annotations:
-                    eln:
-                      component: EnumEditQuantity
-                      props:
-                        suggestions:
-                          - Saint Gobain
+              stack_sequence:
+                type: str
+                shape: ['*']
+                description: |
+                  The stack sequence describing the cell. This is a repeating cell - after entering one layer, a new field will open below to fill the next layer. Use the following formatting guidelines
+                  - Start with the substrate and list the materials in each layer of the device
+                  - If two materials, e.g. A and B, are mixed in one layer, list the materials in alphabetic order and separate them with semicolons, as in (A; B)
+                  - The absorber layer is commonly stated with a generaic name as 'CZTSe', regardless of composition, mixtures, dimensionality etc. There are other fields to describe the absorber layer in depth.            
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - quartz
+                        - SLG
+                        - stainless steel foil
+                        - NaF
+                        - Mo
+                        - MoS
+                        - MoSe
+                        - CZTS
+                        - CZTSe
+                        - CZTSSe
+                        - CdS
+                        - Au
+                        - Ag
+
+
+              # substrate_material:
+              #   type: str
+              #   m_annotations:
+              #     eln:
+              #       component: EnumEditQuantity
+              #       props:
+              #         suggestions:
+              #           - quartz
+              #           - SLG
+              #           - stainless steel
+                
+              substrate_supplier:
+                type: str
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - Saint Gobain
+        
+        sample_stack_alternative_representation:
+          repeats: true
+          section:
+
+            quantities:
+              material:
+                type: str
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - quartz
+                        - SLG
+                        - stainless steel foil
+                        - NaF
+                        - Mo
+                        - MoS
+                        - MoSe
+                        - CZTS
+                        - CZTSe
+                        - CZTSSe
+                        - CdS
+                        - Au
+                        - Ag
+              thickness:
+                type: np.float64
+                unit: nm
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "nm"
+              origin_or_deposition_method:
+                type: str
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - 'supplied by:'
+                        - PVD / Co-Evaporation
+                        - DC sputtering
+                        - AC sputtering
+                        - Solution based
+
+              
+              
+
         precursor_layer:
           repeats: true
           section:
@@ -106,6 +197,7 @@ definitions:
                           - ICP-MS
                           - WDX
                           - RBS
+        
         absorber_layer:
           section:
             # Below we inherit from 2 base sections. The Chemical base section adds the
@@ -273,6 +365,7 @@ definitions:
                           - ICP-MS
                           - WDX
                           - RBS
+        
         optoelectronic_properties:
           section:
             base_sections:
@@ -390,14 +483,16 @@ definitions:
         solar_cell_parameters:
           section:
             base_sections: 
+              - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
               - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
+              - nomad.datamodel.metainfo.eln.SolarCellDefinition
               - 'nomad.parsing.tabular.TableData'
             m_annotations:
               # We can use the eln annotations to put the section to the overview
               # page, and hide unwanted inherited quantities.
               eln:
                 overview: true
-                hide: ['potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'series_resistance', 'shunt_resistance']
+                hide: ['area_total', 'area_effective', 'cell_name', 'potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'series_resistance', 'shunt_resistance', 'stack_sequence', 'architecture']
               # Plots are shown in the eln. Currently we only support simple x,y
               # line plots
               plot:
@@ -463,66 +558,11 @@ definitions:
                 m_annotations:
                   eln:
                     component: NumberEditQuantity
+            # sub_sections:
+            #   Module:
+            #     section:
+            #       base_sections:
 
-        # solar_cell_parameters:
-        #   section:
-        #     base_sections:
-        #       - nomad.datamodel.metainfo.eln.SolarCellJVCurve
-        #       - nomad.datamodel.metainfo.eln.SolarCellDefinition
-        #     m_annotations:
-        #       eln: 
-        #         hide: ['architecture', 'stack_sequence', 'current_density', 'voltage']
-        #     quantities:
-        #       stack_sequence:
-        #         type: str
-        #         description: |
-        #                 Sequence of the stack starting with the substrate, separated by '/'. e.g. Glass/Mo/CZTSe/CdS/ZnO/Ag
-        #         m_annotations:
-        #           tabular:
-        #             name: Device structure
-        #           eln:
-        #             component: StringEditQuantity
-        #       solar_cell_area:
-        #         type: np.float64
-        #         unit: cm**2
-        #         m_annotations:
-        #           tabular:
-        #             name: Area (cm2)
-        #           eln:
-        #             component: NumberEditQuantity
-        #       open_circuit_voltage:
-        #         type: np.float64
-        #         unit: V
-        #         m_annotations:
-        #           tabular:
-        #             name: VOC (V)
-        #           eln:
-        #             component: NumberEditQuantity
-        #       short_circuit_current_density:
-        #         type: np.float64
-        #         unit: mA/cm**2
-        #         m_annotations:
-        #           tabular:
-        #             name: JSC (mA cm−2)
-        #           eln:
-        #             component: NumberEditQuantity          
-        #       fill_factor:
-        #         type: np.float64
-        #         m_annotations:
-        #           tabular:
-        #             name: FF  
-        #           eln:
-        #             component: NumberEditQuantity
-        #             minValue: 0
-        #             maxValue: 1
-        #       efficiency:
-        #         type: np.float64
-        #         m_annotations:
-        #           tabular:
-        #             name: Eff. (%)  
-        #           eln:
-        #             component: NumberEditQuantity
-                  
         publication_reference:
           section:
             base_sections: 
