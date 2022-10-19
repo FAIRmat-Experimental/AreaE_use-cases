@@ -1,1 +1,1 @@
-This is a folder to contain schemas and ELNs associated with the viperlab project
+This is a folder for schemas and ELNs associated with the viperlab project
