@@ -1,53 +1,61 @@
 definitions:
-  name: 'Solar cell schema'
+  name: 'Basic solar cell example schema'
   sections:
-    SolarCell:
-      # Important: must inherit from both, ElnBaseSection and TableRow
-      # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
-      # do some work in the backgroud, like parsing the values, making quantities serachable and copying
+    ExampleSolarCell:
+      # `base_sections` are used to inherit from definitions already in nomad. These base classes 
+      # do some work in the backgroud, like parsing values, making quantities searchable and copying
       # values to our `Results` section, where all the entries become interoperable.
       base_sections: 
-        #- nomad.datamodel.metainfo.eln.ElnBaseSection
-        - 'nomad.datamodel.data.EntryData'
-
+        - nomad.datamodel.metainfo.eln.ElnBaseSection
+        - nomad.datamodel.data.EntryData
       m_annotations:
         eln: 
-          hide: ['name', 'lab_id'] # We want to hide some quantities defined in ElnBaseSection in our forms.
+          hide: ['name', 'lab_id'] # We want to hide some quantities defined in ElnBaseSection in our ELN as we will not use them.
       quantities:
         description:
           type: str
           m_annotations:
             eln:
               component: RichTextEditQuantity
+      # Here we start defining the sub sections that we will have in our entry. We will deifne five:
+      # - `publication_reference`
+      # - `solar_cell_definition`
+      # - `solar_cell_parameters`
+      # - `solar_cell_eqe`
+      # - `absorber_layer`
       sub_sections:
         publication_reference:
           section:
+            # This base section allows us to include a DOI number which will be added as a reference to the entry.
+            # It will also retrieve additional information of the publication from crossref.
+            # We are redefining DOI_number to give it a StringEditQuantity ELN component.
             base_sections: 
-              - 'nomad.datamodel.metainfo.eln.PublicationReference'
+              - 'nomad.datamodel.metainfo.eln.PublicationReference' 
             quantities:
               DOI_number:
                 type: str
+                description: |
+                  A DOI of the publication where this data was published.
                 m_annotations:
                   eln:
                     component: StringEditQuantity
         solar_cell_definition:
           section:
+            # The SolarCellDefinition base section provides pre defined quantities for general solar cells including:
+            # - stack_sequence: A list of the layers in the solar cell stack
+            # - solar_cell_area
+            # - architecture: pre defined values for solar cell architectures
+            # It also populates the results section of the archive tagging this entry as "solar cell" 
+            # in `results.materials.functional_type`. This is important for searchability.
             base_section: nomad.datamodel.metainfo.eln.SolarCellDefinition
-            # quantities:
-              # stack_sequence:
-              #   type: str
-              #   shape: ['*']  # Shapes define non scalar values, like lists ['*'], vectors ['*', 3], etc.
-              #   m_annotations:
-              #     eln:
-              #       component: StringEditQuantity
-              # solar_cell_area:
-              #   type: np.float64
-              #   unit: cm**2
-              #   m_annotations:
-              #     eln:
-              #       component: NumberEditQuantity
         solar_cell_parameters:
           section:
+            # The SolarCellJVCurve curve sections add quantities related to the solar cell JV curve, including the `current_density`
+            # and `voltage`. If these two quantities are populated, it will automatically process the `efficiency`, `open_circuit_voltage`,
+            # `short_circuit_current_density` and `fill_factor` from the J-V curve.
+
+            # The base section 'nomad.parsing.tabular.TableData' will be used to parse the `current_density`
+            # and `voltage` values from as provided `data_file`.
             base_sections: 
               - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
               - 'nomad.parsing.tabular.TableData'
@@ -67,8 +75,7 @@ definitions:
               data_file:
                 type: str
                 description: |
-                  A reference to an uploaded .csv produced by the PVD evaporation instruments
-                  control software.
+                  A reference to an uploaded .csv or .xls file containing the J-V data.
                 m_annotations:
                   # The tabular_parser annotation, will treat the values of this
                   # quantity as files. It will try to interpret the files and fill
@@ -83,20 +90,22 @@ definitions:
                     component: FileEditQuantity  # A form field that allows to drop and select files.
               current_density:
                 type: np.float64
+                description: |
+                  The current density array of the J-V curve.
                 shape: ['*']
                 unit: mA/cm**2
                 m_annotations:
                   # The tabular annotation defines a mapping to column headers used in
                   # tabular data files
                   tabular:
-                    name: j_sc
+                    name: j # The column name on the data_file to look for the data.
               voltage:
                 type: np.float64
                 shape: ['*']
                 unit: V
                 m_annotations:
                   tabular:
-                    name: Voltage
+                    name: Voltage # The column name on the data_file to look for the data.
                   plot:
                     x: voltage
                     y: current_density
@@ -126,12 +135,8 @@ definitions:
           section:
             base_section: nomad.datamodel.metainfo.eln.SolarCellEQE
             m_annotations:
-              # We can use the eln annotations to put the section to the overview
-              # page, and hide unwanted inherited quantities.
               eln:
                 overview: true
-              # Plots are shown in the eln. Currently we only support simple x,y
-              # line plots
               plot:
                 title: Extenral quantum efficiency (EQE)
                 x: raw_wavelength_array
@@ -139,17 +144,16 @@ definitions:
         absorber_layer:
           section:
             # Below we inherit from 3 base sections. The Chemical base section adds the
-            # base ELN quantities ['name', 'lab_id', 'description'] that we decide to hide 
+            # base ELN quantities ['name', 'lab_id', 'description'] (that we hide),  
             # and a quantity called `chemical_formula`. `chemical formula` is a quantity in which 
             # a valid chemical formula gets parsed to make the entry searchable by elements and different 
-            # formulae represetantions. The rule here is to introduce formulas which are
+            # formulae representations. The rule here is to introduce formulas which are
             # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
             # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.  
             base_sections: 
               - 'nomad.datamodel.metainfo.eln.Chemical'
               - 'nomad.datamodel.metainfo.eln.SolarCellBaseSectionWithOptoelectronicProperties'
               - 'nomad.datamodel.metainfo.eln.SolarCellLayer'
-            # base_section: nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
               eln: 
                 hide: ['name', 'lab_id', 'description']
@@ -159,20 +163,12 @@ definitions:
                 m_annotations:
                   eln:
                     component: StringEditQuantity   
-              #TODO check why multiple inheritance breaks here and it does normalize the formulas with the quantity below
               solar_cell_layer_type:
                 type: str  # The simple string type
-                default: Absorber
+                default: Absorber # we pre filled this quantity with the value Absorber.
                 m_annotations:
                   eln:
                     component: StringEditQuantity  # A simple text edit form field
-              # layer_name:
-              #   type: str  # The simple string type
-              #   shape: ['0..*']  # The simple string type
-              #   default: MyAbsorber
-              #   m_annotations:
-              #     eln:
-              #       component: StringEditQuantity  # A simple text edit form field
               layer_name:
                 type: str
                 m_annotations:
