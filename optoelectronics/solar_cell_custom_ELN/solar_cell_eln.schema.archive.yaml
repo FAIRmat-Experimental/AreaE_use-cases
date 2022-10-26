@@ -51,7 +51,7 @@ definitions:
         solar_cell_parameters:
           section:
             # The SolarCellJVCurve curve sections add quantities related to the solar cell JV curve, including the `current_density`
-            # and `voltage`. If these two quantities are populated, it will automatically process the `efficiency`, `open_circuit_voltage`,
+            # and `voltage` and other solar cell parameteres. If these two quantities are populated, it will automatically process the `efficiency`, `open_circuit_voltage`,
             # `short_circuit_current_density` and `fill_factor` from the J-V curve.
 
             # The base section 'nomad.parsing.tabular.TableData' will be used to parse the `current_density`
@@ -109,28 +109,6 @@ definitions:
                   plot:
                     x: voltage
                     y: current_density
-              open_circuit_voltage:
-                type: np.float64
-                unit: V
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
-              short_circuit_current_density:
-                type: np.float64
-                unit: mA/cm**2
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity          
-              fill_factor:
-                type: np.float64
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
-              efficiency:
-                type: np.float64
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
         solar_cell_eqe:
           section:
             base_section: nomad.datamodel.metainfo.eln.SolarCellEQE
