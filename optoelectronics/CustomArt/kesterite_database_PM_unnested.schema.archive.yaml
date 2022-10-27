@@ -1,0 +1,722 @@
+﻿definitions:
+  name: 'Kesterite Thin-Film Sample Unnested'
+  # Version 1.0
+  sections:
+    KesteriteSampleUnnested:
+      # Important: must inherit from both, ElnBaseSection and TableRow
+      # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
+      # do some work in the backgroud, like parsing the values, making quantities serachable and copying
+      # values to our `Results` section, where all the entries become interoperable.
+
+      base_sections: 
+        - nomad.datamodel.metainfo.eln.ElnBaseSection
+        - nomad.datamodel.metainfo.eln.SampleID
+        - nomad.datamodel.data.EntryData
+      # description: |
+      #   This is an example description for Chemical.
+      m_annotations:
+      # We define a pre filled template for the archive. 
+        template:
+            solar_cell_definition:
+              sample_stack:
+                - solar_cell_layer_type: Substrate
+                  layer_name: SLG
+                  origin_or_deposition_method: 'supplied by:'
+                - solar_cell_layer_type: Contact
+                  layer_name: Mo
+                - solar_cell_layer_type: Contact
+                  layer_name: MoS2
+                - solar_cell_layer_type: Absorber
+                  layer_name: CZTS
+                - solar_cell_layer_type: Buffer
+                  layer_name: CdS
+                - solar_cell_layer_type: Buffer
+                  layer_name: i-ZnO
+                - solar_cell_layer_type: p-type contact
+                  layer_name: AZO
+              architecture: Pn-Heterojunction
+        eln: 
+          hide: ['name', 'lab_id', 'children', 'parents'] # We want to hide some quantities defined in ElnBaseSection in our forms.
+          lane_width: 800px
+          # description: |
+          #           This is an entry describing one Kesterite sample. The information for the sample may be added gradually and editted or completed at a later point. 
+      quantities:
+        status:
+          type:
+            type_kind: Enum
+            type_data:
+              - planned
+              - in preparation
+              - fully prepared
+              - published
+          description: |
+                        Current status of the sample.
+          m_annotations:
+            eln:
+              component: RadioEnumEditQuantity
+      sub_sections:
+        publication_reference:
+          section:
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.PublicationReference
+              - nomad.datamodel.metainfo.eln.ElnBaseSection
+            m_annotations:
+              eln:
+                hide: ['name', 'lab_id']
+            quantities:
+              DOI_number:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+        precursor_layer: 
+          repeats: true
+          section:
+            more:
+              label_quantity: chemical_formula
+            base_sections:
+              - nomad.datamodel.metainfo.eln.ElnBaseSection
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id','layer_name', 'solar_cell_layer_type']
+                component: RichTextEditQuantity
+            quantities:
+              precursor_deposition_method:
+                type: str
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - PVD / Co-Evaporation
+                        - DC sputtering
+                        - AC sputtering
+                        - Solution based
+              chemical_formula:
+                type: str
+                description: |+
+                  Chemical formula stating the absorber layer composition.
+                  Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              layer_thickness:
+                type: np.float64
+                unit: nm
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "nm"
+              composition_quantification_method:
+                type: str
+                m_annotations:
+                  eln:
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Deposition Parameters
+                          - XRF
+                          - XPS
+                          - EDX
+                          - GDOES
+                          - ICP-MS
+                          - WDX
+                          - RBS
+        absorber_layer_properties:
+          section:
+            # Below we inherit from 2 base sections. The Chemical base section adds the
+            # base ELN quantities ['name', 'lab_id', 'description'] that we decide to hide 
+            # and a quantity called 'chemical_formula'. 'chemical formula' is a quantity in which 
+            # a valid chemical formula gets parsed to make the entry searchable by elements and different 
+            # formulae represetantions. The rule here is to introduce formulas which are
+            # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
+            # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+            base_sections: 
+              - 'nomad.datamodel.metainfo.eln.Chemical'
+              # - 'nomad.datamodel.metainfo.eln.SolarCellLayer'
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id', 'description', 'layer_name', 'bandgap', 'solar_cell_layer_type']
+            quantities:
+              chemical_formula:
+                type: str
+                description: |+
+                  Chemical formula stating the absorber layer composition.
+                  
+                  Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              composition_quantification_method:
+                type: str
+                m_annotations:
+                  eln:
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Deposition Parameters
+                          - XRF
+                          - XPS
+                          - EDX
+                          - GDOES
+                          - ICP-MS
+                          - WDX
+                          - RBS
+              description:
+                type: str
+                m_annotations:
+                  eln:
+                    component: RichTextEditQuantity
+        absorber_chalcogenization:
+          section:
+            quantities: 
+              type_of_setup:
+                description: |
+                              Type of machine in which the chalcogenization is conducted.
+                type:
+                  type_kind: Enum
+                  type_data:
+                    - Tube furnace
+                    - RTP
+                    - dedicated vavacuum chamber
+                    - other
+                m_annotations:
+                  eln:
+                    component: RadioEnumEditQuantity
+              recipient_material:
+                description: |
+                              Material of the recipient in which the chalcogenization is conducted.
+                type:
+                  type_kind: Enum
+                  type_data:
+                    - Graphite
+                    - Quartz
+                m_annotations:
+                  eln:
+                    component: RadioEnumEditQuantity
+              recipient_mass:
+                description: |
+                                Mass of the recipient in which the chalcogenization is conducted.
+                type: np.float64
+                unit: g
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "g"
+              recipient_inner_volume:
+                description: |
+                                Volume of atmosphere/air inside the closed recipient with the sample placed inside.
+                type: np.float64
+                unit: cm^3
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "cm^3"
+              recipient_closed_with_screws?:
+                description: |
+                              Was the lid of the recipient closed with bolts/screws?
+                type: bool
+                m_annotations:
+                  eln:
+                    component: BoolEditQuantity
+            sub_sections:
+              reactants:
+                repeats: true
+                section:
+                  more:
+                    label_quantity: reactant_chemical_formula
+                  quantities:
+                    reactant_chemical_formula:
+                      description: |
+                                      Chemical formula of the reactant used.
+                      type: str
+                      m_annotations:
+                        eln:
+                            component: EnumEditQuantity
+                            props:
+                              suggestions:
+                                - S
+                                - Se
+                                - Sn
+                                - LiH4
+                    reactant_physical_form:
+                      description: |
+                                      Physical form of the reactant.
+                      type: str
+                      m_annotations:
+                        eln:
+                            component: EnumEditQuantity
+                            props:
+                              suggestions:
+                                - Pellets
+                                - Powder
+                                - Wire
+                                - Gas
+                    reactant_mass:
+                      description: |
+                                      Mass of this reactant if in solid form.
+                      type: np.float64
+                      unit: mg
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "mg"
+                    reactant_flow_rate:
+                      description: |
+                                      Flow of this reactant if in gas form.
+                      type: np.float64
+                      unit: cm^3/minute
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+              temperature_steps:
+                repeats: true
+                section:
+                  more:
+                    label_quantity: temperature
+                  quantities:
+                    temperature:
+                      description: |
+                                      Final temperature of that step.
+                      type: np.float64
+                      unit: °C
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "°C"
+                    dwell_time:
+                      description: |
+                                      Time spent at the given temperature after reaching it.
+                      type: np.float64
+                      unit: minute
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "minute"
+                    temperature_ramp:
+                      description: |
+                                      Rate of temperature increase/decrease to reach the final temperature of this stage.
+                      type: np.float64
+                      unit: K/minute
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "K/minute"
+                    atmosphere:
+                      description: |
+                                    Atmosphere in the recipient during this step.
+                      type: str
+                      m_annotations:
+                        eln:
+                            component: EnumEditQuantity
+                            props:
+                              suggestions:
+                                - N2
+                                - Ar
+                                - Air
+                    pressure:
+                      description: |
+                                      Pressure in the recipient during this step.
+                      type: np.float64
+                      unit: hPa
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+                          defaultDisplayUnit: "hPa"
+                    atmosphere_flow:
+                      description: |
+                                      Flow of gas in the recipient during this step.
+                      type: np.float64
+                      unit: cm^3 / minute
+                      m_annotations:
+                        eln:
+                          component: NumberEditQuantity
+        absorber_etching:
+          section:
+            quantities: 
+              type_of_setup:
+                description: |
+                              type of etching setup.
+                type:
+                  type_kind: Enum
+                  type_data:
+                    - chemical bath
+                    - plasma etching
+                    - other
+                m_annotations:
+                  eln:
+                    component: RadioEnumEditQuantity
+              etching_chemical:
+                type: str
+                description: |+
+                    Chemical formula for etching chemical
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              etching temperature:
+                description: |
+                                etching temperature.
+                type: np.float64
+                unit: °C
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "°C"
+
+              etching_duration:
+                description: |
+                                duration of etching.
+                type: np.float64
+                unit: minute
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "minute"   
+        absorber_post_annealing:
+                repeats: true
+                section:
+                  quantities: 
+                    Annealing_setup:
+                      description: |
+                                    type of annealing setup.
+                      type:
+                        type_kind: Enum
+                        type_data:
+                          - vacuum chamber
+                          - hot plate
+                          - other
+                      m_annotations:
+                        eln:
+                          component: RadioEnumEditQuantity
+                    Annealing_temperature:
+                            description: |
+                                            Final temperature of that step.
+                            type: np.float64
+                            unit: °C
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "°C"
+                    Annealing_dwell_time:
+                            description: |
+                                            Time spent at the given temperature after reaching it.
+                            type: np.float64
+                            unit: minute
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "minute"
+                    Annealing_temperature_ramp:
+                            description: |
+                                            Rate of temperature increase/decrease to reach the final temperature of this stage.
+                            type: np.float64
+                            unit: K/minute
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "K/minute"
+                    Annealing_atmosphere:
+                            description: |
+                                          Atmosphere in the recipient during this step.
+                            type: str
+                            m_annotations:
+                              eln:
+                                  component: EnumEditQuantity
+                                  props:
+                                    suggestions:
+                                      - N2
+                                      - Ar
+                                      - Air
+                    Annealing_pressure:
+                            description: |
+                                            Pressure in the recipient during this step.
+                            type: np.float64
+                            unit: hPa
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+                                defaultDisplayUnit: "hPa"
+                    Annealing_atmosphere_flow:
+                            description: |
+                                            Flow of gas in the recipient during this step.
+                            type: np.float64
+                            unit: cm^3 / minute
+                            m_annotations:
+                              eln:
+                                component: NumberEditQuantity
+        optoelectronic_properties:
+          section:
+            base_sections:
+              - 'nomad.datamodel.metainfo.eln.SolarCellBaseSectionWithOptoelectronicProperties'
+            quantities:
+              bandgap_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the bandgap value.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - Tauc plot
+                        - EQE-derivative
+              equilibrium_carrier_concentration:
+                type: np.float64
+                unit: cm**-3
+                # description: |
+                #         Doping level.
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: cm**-3
+              equilibrium_carrier_concentration_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the equilibrium_carrier_concentration.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - Capacitance-Voltage
+                        - Hall effect
+                        - Photohall effect
+              lifetime:
+                type: np.float64
+                unit: s
+                # description: |
+                #         Lorem ipsum
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: ns
+              lifetime_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the lifetime.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - TRPL
+              PLQY:
+                type: np.float64
+                description: |
+                        Photoluminescence Quantum Yield.
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    minValue: 0
+                    maxValue: 1
+              PLQY_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the photoluminescence quantum yield.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - absolute calibrated PL
+              QFLS:
+                type: np.float64
+                unit: eV
+                description: |
+                        Quasi Fermi Level Splitting.
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: eV
+              QFLS_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the quasi fermi level splitting.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - absolute calibrated PLQY
+                        - SPV
+              Bandtail_Energy:
+                type: np.float64
+                unit: eV
+                description: |
+                        Urbach tail energy.
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: eV
+              Bandtail_estimation_basis:
+                type: str
+                description: |
+                        Measurement or technique used to determine the Bandtail Energy.
+                m_annotations:
+                  eln:
+                    component: EnumEditQuantity
+                    props:
+                      suggestions:
+                        - EQE
+                        - UV-VIS
+                        - PDS
+        solar_cell_definition:
+          section:
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id', 'description', 'stack_sequence']
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.SolarCellDefinition
+            quantities:
+              solar_cell_completed:
+                type: bool
+                m_annotations:
+                  eln:
+                    component: BoolEditQuantity
+            sub_sections:
+              sample_stack:
+                repeats: true
+                section:
+                  base_sections: 
+                    - nomad.datamodel.metainfo.eln.SolarCellLayer
+                  more:
+                    label_quantity: layer_name
+                  quantities:
+                    layer_name:
+                      type: str
+                      m_annotations:
+                        eln:
+                          component: EnumEditQuantity
+                          props:
+                            suggestions:
+                              - quartz
+                              - SLG
+                              - stainless steel foil
+                              - NaF
+                              - Mo
+                              - MoS
+                              - MoSe
+                              - CZTS
+                              - CZTSe
+                              - CZTSSe
+                              - CdS
+                              - i-ZnO
+                              - AZO
+                              - ITO
+                              - Au
+                              - Ag
+                              - MgF
+                    # thickness:
+                    #   type: np.float64
+                    #   unit: nm
+                    #   m_annotations:
+                    #     eln:
+                    #       component: NumberEditQuantity
+                    #       defaultDisplayUnit: "nm"
+                    origin_or_deposition_method:
+                      type: str
+                      m_annotations:
+                        eln:
+                          component: EnumEditQuantity
+                          props:
+                            suggestions:
+                              - 'supplied by:'
+                              - PVD / Co-Evaporation
+                              - DC sputtering
+                              - AC sputtering
+                              - Solution based
+        solar_cell_JV:
+          section:
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
+              - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
+              - nomad.datamodel.metainfo.eln.SolarCellDefinition
+              - 'nomad.parsing.tabular.TableData'
+            m_annotations:
+              # We can use the eln annotations to put the section to the overview
+              # page, and hide unwanted inherited quantities.
+              eln:
+                overview: true
+                hide: ['area_total',  'cell_name', 'potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'stack_sequence', 'architecture']
+              # Plots are shown in the eln. Currently we only support simple x,y
+              # line plots
+              plot:
+                title: J-V curve
+                x: voltage
+                y: current_density
+            quantities:
+              data_file:
+                type: str
+                description: |
+                  A reference to an uploaded .csv produced by the PVD evaporation instruments
+                  control software.
+                m_annotations:
+                  # The tabular_parser annotation, will treat the values of this
+                  # quantity as files. It will try to interpret the files and fill
+                  # quantities in this section (and sub_section) with the column
+                  # data of .csv or .xlsx files.
+                  tabular_parser:
+                    # sep: '\t'
+                    comment: '#'
+                  browser:
+                    adaptor: RawFileAdaptor  # Allows to navigate to files in the data browser
+                  eln:
+                    component: FileEditQuantity  # A form field that allows to drop and select files.
+              current_density:
+                type: np.float64
+                shape: ['*']
+                unit: mA/cm**2
+                m_annotations:
+                  # The tabular annotation defines a mapping to column headers used in
+                  # tabular data files
+                  tabular:
+                    name: 'Current Density in mA cm^-2'
+              voltage:
+                type: np.float64
+                shape: ['*']
+                unit: V
+                m_annotations:
+                  tabular:
+                    name: 'Voltage in V'
+                  plot:
+                    x: voltage
+                    y: current_density
+              open_circuit_voltage:
+                type: np.float64
+                unit: V
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+              short_circuit_current_density:
+                type: np.float64
+                unit: mA/cm**2
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity          
+              fill_factor:
+                type: np.float64
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+              efficiency:
+                type: np.float64
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+        solar_cell_EQE:
+          section:
+            base_sections:
+              - nomad.datamodel.metainfo.eln.SolarCellEQE
+            m_annotations:
+              # We can use the eln annotations to put the section to the overview
+              # page, and hide unwanted inherited quantities.
+              eln:
+                overview: true
+              # Plots are shown in the eln. Currently we only support simple x,y
+              # line plots
+              plot:
+                title: External quantum efficiency (EQE)
+                x: raw_wavelength_array
+                y: raw_eqe_array
+
+
