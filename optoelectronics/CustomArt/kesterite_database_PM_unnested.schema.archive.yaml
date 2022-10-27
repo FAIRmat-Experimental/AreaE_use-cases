@@ -78,8 +78,7 @@
               - nomad.datamodel.metainfo.eln.ElnBaseSection
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id','layer_name', 'solar_cell_layer_type']
-                component: RichTextEditQuantity
+                hide: ['name', 'lab_id', 'layer_name', 'solar_cell_layer_type']
             quantities:
               precursor_deposition_method:
                 type: str
@@ -95,8 +94,7 @@
               chemical_formula:
                 type: str
                 description: |+
-                  Chemical formula stating the absorber layer composition.
-                  Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+                  Chemical formula stating the precursor layer composition.
                 m_annotations:
                   eln:
                     component: StringEditQuantity
@@ -132,11 +130,11 @@
             # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
             # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
             base_sections: 
-              - 'nomad.datamodel.metainfo.eln.Chemical'
-              # - 'nomad.datamodel.metainfo.eln.SolarCellLayer'
+              - nomad.datamodel.metainfo.eln.ElnBaseSection
+              - nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id', 'description', 'layer_name', 'bandgap', 'solar_cell_layer_type']
+                hide: ['name', 'lab_id', 'layer_name', 'bandgap', 'solar_cell_layer_type']
             quantities:
               chemical_formula:
                 type: str
@@ -162,13 +160,32 @@
                           - ICP-MS
                           - WDX
                           - RBS
+              additives:
+                type: str
+                description: |+
+                  Chemical formula of the additive or dopant in the absorber layer
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
               description:
                 type: str
                 m_annotations:
                   eln:
-                    component: RichTextEditQuantity
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - Na
+                          - Li
+                          - K
+                          - NaF
+                          - KF
         absorber_chalcogenization:
           section:
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.ElnBaseSection        
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id']                
             quantities: 
               type_of_setup:
                 description: |
