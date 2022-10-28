@@ -12,8 +12,9 @@
         - nomad.datamodel.metainfo.eln.ElnBaseSection
         - nomad.datamodel.metainfo.eln.SampleID
         - nomad.datamodel.data.EntryData
-      # description: |
-      #   This is an example description for Chemical. (and some more)
+      description: |
+        This is an Electronic Labbook for entering CZTS and related Sample Data
+        
       m_annotations:
       # We define a pre filled template for the archive. 
         template:
@@ -28,8 +29,6 @@
                   layer_name: MoS2
                 - solar_cell_layer_type: Absorber
                   layer_name: CZTS
-                - solar_cell_layer_type: Buffer
-                  layer_name: CdS
                 - solar_cell_layer_type: Buffer
                   layer_name: i-ZnO
                 - solar_cell_layer_type: p-type contact
