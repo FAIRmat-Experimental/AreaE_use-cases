@@ -13,7 +13,7 @@
         - nomad.datamodel.metainfo.eln.SampleID
         - nomad.datamodel.data.EntryData
       # description: |
-      #   This is an example description for Chemical.
+      #   This is an example description for Chemical. (and some more)
       m_annotations:
       # We define a pre filled template for the archive. 
         template:
