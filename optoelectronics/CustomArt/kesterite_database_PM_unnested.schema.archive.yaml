@@ -1,5 +1,5 @@
 ﻿definitions:
-  name: 'Kesterite Thin-Film Sample Pepe'
+  name: 'Kesterite Sample'
   # Version 1.0
   sections:
     KesteriteSample:
