@@ -75,12 +75,12 @@
             more:
               label_quantity: chemical_formula
             base_sections:
-              - nomad.datamodel.metainfo.eln.ElnBaseSection
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id', 'layer_name', 'solar_cell_layer_type']
+                hide: ['name', 'lab_id', 'layer_name', 'solar_cell_layer_type', 'user']
             quantities:
-              precursor_deposition_method:
+              method:
                 type: str
                 m_annotations:
                   eln:
