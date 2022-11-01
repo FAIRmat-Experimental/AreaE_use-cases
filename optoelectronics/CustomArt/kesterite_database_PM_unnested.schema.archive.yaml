@@ -1,8 +1,8 @@
 ﻿definitions:
-  name: 'Kesterite Thin-Film Sample Unnested'
+  name: 'Kesterite Thin-Film Sample Pepe'
   # Version 1.0
   sections:
-    KesteriteSampleUnnested:
+    KesteriteSample:
       # Important: must inherit from both, ElnBaseSection and TableRow
       # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
       # do some work in the backgroud, like parsing the values, making quantities serachable and copying
@@ -122,7 +122,7 @@
                           - RBS
         absorber_layer_properties:
           section:
-            # Below we inherit from 2 base sections. The Chemical base section adds the
+            # Below we inherit from a base sections. The Chemical base section adds the
             # base ELN quantities ['name', 'lab_id', 'description'] that we decide to hide 
             # and a quantity called 'chemical_formula'. 'chemical formula' is a quantity in which 
             # a valid chemical formula gets parsed to make the entry searchable by elements and different 
@@ -133,13 +133,24 @@
               - nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id', 'layer_name', 'bandgap', 'solar_cell_layer_type']
+                hide: ['name', 'lab_id', 'layer_name']
             quantities:
+              absorber_type:
+                type:
+                  type_kind: Enum
+                  type_data:
+                    - Thin-Film
+                    - Monograin
+                    - Single Crystal
+                description: |
+                              Categorical description of the form of the absorber.
+                m_annotations:
+                  eln:
+                    component: RadioEnumEditQuantity
               chemical_formula:
                 type: str
                 description: |+
                   Chemical formula stating the absorber layer composition.
-                  
                   Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
                 m_annotations:
                   eln:
@@ -177,7 +188,7 @@
         absorber_chalcogenization:
           section:
             base_sections: 
-              - nomad.datamodel.metainfo.eln.ElnBaseSection        
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection        
             m_annotations:
               eln: 
                 hide: ['name', 'lab_id']                
@@ -231,6 +242,11 @@
                 m_annotations:
                   eln:
                     component: BoolEditQuantity
+              method:
+                      description: |
+                                    Process method.
+                      type: str
+                      default: Chalcogenization
             sub_sections:
               reactants:
                 repeats: true
@@ -345,6 +361,11 @@
                           component: NumberEditQuantity
         absorber_etching:
           section:
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection       
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id']
             quantities: 
               type_of_setup:
                 description: |
@@ -384,78 +405,93 @@
                   eln:
                     component: NumberEditQuantity
                     defaultDisplayUnit: "minute"   
-        absorber_post_annealing:
-                repeats: true
-                section:
-                  quantities: 
-                    Annealing_setup:
-                      description: |
-                                    type of annealing setup.
-                      type:
-                        type_kind: Enum
-                        type_data:
-                          - vacuum chamber
-                          - hot plate
-                          - other
-                      m_annotations:
-                        eln:
-                          component: RadioEnumEditQuantity
-                    Annealing_temperature:
-                            description: |
-                                            Final temperature of that step.
-                            type: np.float64
-                            unit: °C
-                            m_annotations:
-                              eln:
-                                component: NumberEditQuantity
-                                defaultDisplayUnit: "°C"
-                    Annealing_dwell_time:
-                            description: |
-                                            Time spent at the given temperature after reaching it.
-                            type: np.float64
-                            unit: minute
-                            m_annotations:
-                              eln:
-                                component: NumberEditQuantity
-                                defaultDisplayUnit: "minute"
-                    Annealing_temperature_ramp:
-                            description: |
-                                            Rate of temperature increase/decrease to reach the final temperature of this stage.
-                            type: np.float64
-                            unit: K/minute
-                            m_annotations:
-                              eln:
-                                component: NumberEditQuantity
-                                defaultDisplayUnit: "K/minute"
-                    Annealing_atmosphere:
-                            description: |
-                                          Atmosphere in the recipient during this step.
-                            type: str
-                            m_annotations:
-                              eln:
-                                  component: EnumEditQuantity
-                                  props:
-                                    suggestions:
-                                      - N2
-                                      - Ar
-                                      - Air
-                    Annealing_pressure:
-                            description: |
-                                            Pressure in the recipient during this step.
-                            type: np.float64
-                            unit: hPa
-                            m_annotations:
-                              eln:
-                                component: NumberEditQuantity
-                                defaultDisplayUnit: "hPa"
-                    Annealing_atmosphere_flow:
-                            description: |
-                                            Flow of gas in the recipient during this step.
-                            type: np.float64
-                            unit: cm^3 / minute
-                            m_annotations:
-                              eln:
-                                component: NumberEditQuantity
+              method:
+                description: |
+                              Process method.
+                type: str
+                default: Etching
+        post_annealing:
+          repeats: true
+          section:
+            base_sections: 
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
+            m_annotations:
+              eln: 
+                hide: ['name', 'lab_id']      
+            quantities: 
+              annealing_setup:
+                description: |
+                              type of annealing setup.
+                type:
+                  type_kind: Enum
+                  type_data:
+                    - vacuum chamber
+                    - hot plate
+                    - other
+                m_annotations:
+                  eln:
+                    component: RadioEnumEditQuantity
+              annealing_temperature:
+                description: |
+                                Final temperature of that step.
+                type: np.float64
+                unit: °C
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "°C"
+              annealing_dwell_time:
+                description: |
+                                Time spent at the given temperature after reaching it.
+                type: np.float64
+                unit: minute
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "minute"
+              annealing_temperature_ramp:
+                description: |
+                                Rate of temperature increase/decrease to reach the final temperature of this stage.
+                type: np.float64
+                unit: K/minute
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "K/minute"
+              annealing_atmosphere:
+                description: |
+                              Atmosphere in the recipient during this step.
+                type: str
+                m_annotations:
+                  eln:
+                      component: EnumEditQuantity
+                      props:
+                        suggestions:
+                          - N2
+                          - Ar
+                          - Air
+              annealing_pressure:
+                description: |
+                                Pressure in the recipient during this step.
+                type: np.float64
+                unit: hPa
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+                    defaultDisplayUnit: "hPa"
+              annealing_atmosphere_flow:
+                description: |
+                                Flow of gas in the recipient during this step.
+                type: np.float64
+                unit: cm^3 / minute
+                m_annotations:
+                  eln:
+                    component: NumberEditQuantity
+              method:
+                description: |
+                              Process method.
+                type: str
+                default: Post Annealing
         optoelectronic_properties:
           section:
             base_sections:
