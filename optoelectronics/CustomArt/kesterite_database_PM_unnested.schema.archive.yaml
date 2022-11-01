@@ -15,7 +15,7 @@
       # description: |
       #   This is an example description for Chemical.
       m_annotations:
-      # We define a pre filled template for the archive. 
+      # We define a pre filled template for the archive to have a solar cell structure already appended. 
         template:
             solar_cell_definition:
               sample_stack:
@@ -133,7 +133,7 @@
               - nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id', 'layer_name']
+                hide: ['name', 'lab_id']
             quantities:
               absorber_type:
                 type:
@@ -191,7 +191,7 @@
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection        
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id']                
+                hide: ['name', 'lab_id', 'user']                
             quantities: 
               type_of_setup:
                 description: |
@@ -201,7 +201,7 @@
                   type_data:
                     - Tube furnace
                     - RTP
-                    - dedicated vavacuum chamber
+                    - dedicated vacuum chamber
                     - other
                 m_annotations:
                   eln:
@@ -365,7 +365,7 @@
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection       
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id']
+                hide: ['name', 'lab_id', 'user']
             quantities: 
               type_of_setup:
                 description: |
@@ -417,7 +417,7 @@
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id']      
+                hide: ['name', 'lab_id', 'user']      
             quantities: 
               annealing_setup:
                 description: |
@@ -676,16 +676,15 @@
         solar_cell_JV:
           section:
             base_sections: 
-              - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
+              # - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
               - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
-              - nomad.datamodel.metainfo.eln.SolarCellDefinition
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
+              # - nomad.datamodel.metainfo.eln.SolarCellDefinition
               - 'nomad.parsing.tabular.TableData'
             m_annotations:
-              # We can use the eln annotations to put the section to the overview
-              # page, and hide unwanted inherited quantities.
               eln:
                 overview: true
-                hide: ['area_total',  'cell_name', 'potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'stack_sequence', 'architecture']
+                hide: ['cell_name', 'potential_at_maximum_power_point', 'current_density_at_maximun_power_point', 'user', 'name', 'lab_id']
               # Plots are shown in the eln. Currently we only support simple x,y
               # line plots
               plot:
@@ -728,37 +727,29 @@
                     name: 'Voltage in V'
                   plot:
                     x: voltage
-                    y: current_density
-              open_circuit_voltage:
-                type: np.float64
-                unit: V
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
-              short_circuit_current_density:
-                type: np.float64
-                unit: mA/cm**2
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity          
+                    y: current_density      
               fill_factor:
                 type: np.float64
+                description: |
+                              The fill factor of the solar cell. Values are from 0 to 1.
                 m_annotations:
                   eln:
                     component: NumberEditQuantity
-              efficiency:
-                type: np.float64
-                m_annotations:
-                  eln:
-                    component: NumberEditQuantity
+                    minValue: 0
+                    maxValue: 1
+              method:
+                description: |
+                              Characterization method.
+                type: str
+                default: Current-Voltage Scan (JV)
         solar_cell_EQE:
           section:
             base_sections:
               - nomad.datamodel.metainfo.eln.SolarCellEQE
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
             m_annotations:
-              # We can use the eln annotations to put the section to the overview
-              # page, and hide unwanted inherited quantities.
-              eln:
+              eln: 
+                hide: ['name', 'lab_id', 'user']
                 overview: true
               # Plots are shown in the eln. Currently we only support simple x,y
               # line plots
@@ -766,5 +757,10 @@
                 title: External quantum efficiency (EQE)
                 x: raw_wavelength_array
                 y: raw_eqe_array
-
+            quantities: 
+              method:
+                description: |
+                              Characterization method.
+                type: str
+                default: External Quantum Efficiency (EQE)
 
