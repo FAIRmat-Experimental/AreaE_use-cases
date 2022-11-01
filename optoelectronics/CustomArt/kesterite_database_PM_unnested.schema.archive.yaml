@@ -130,7 +130,6 @@
             # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
             # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
             base_sections: 
-              - nomad.datamodel.metainfo.eln.ElnBaseSection
               - nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
               eln: 
@@ -164,11 +163,7 @@
                 type: str
                 description: |+
                   Chemical formula of the additive or dopant in the absorber layer
-                m_annotations:
-                  eln:
-                    component: StringEditQuantity
-              description:
-                type: str
+                shape: '*'
                 m_annotations:
                   eln:
                       component: EnumEditQuantity
