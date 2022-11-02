@@ -7,6 +7,8 @@
       # `base_sections` are used to inherit from definitions alreadybin nomad. These base classes 
       # do some work in the backgroud, like parsing the values, making quantities serachable and copying
       # values to our `Results` section, where all the entries become interoperable.
+      description: |
+          This is a DataBase Entry Schema for Kesterite-type Solar Cell Materials V1 - November 1, 2022.
 
       base_sections: 
         - nomad.datamodel.metainfo.eln.ElnBaseSection
@@ -57,6 +59,8 @@
       sub_sections:
         publication_reference:
           section:
+            description: |
+                Publication reference data: drop DOI in the corresponding field.  Use free text if some notetaking is needed, as this section will not be searchable
             base_sections: 
               - nomad.datamodel.metainfo.eln.PublicationReference
               - nomad.datamodel.metainfo.eln.ElnBaseSection
@@ -66,21 +70,25 @@
             quantities:
               DOI_number:
                 type: str
+                description: |
+                      Drop DOI here, this will call autofill of the other fields.
                 m_annotations:
                   eln:
                     component: StringEditQuantity
         precursor_layer: 
           repeats: true
           section:
+            description: |  
+                  Description of Precursor layer method, composition. Also the time of precursor layer synthesis can be entered      
             more:
               label_quantity: chemical_formula
             base_sections:
-              - nomad.datamodel.metainfo.eln.ElnBaseSection
+              - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
             m_annotations:
               eln: 
-                hide: ['name', 'lab_id', 'layer_name', 'solar_cell_layer_type']
+                hide: ['name', 'lab_id', 'layer_name', 'solar_cell_layer_type', 'user']
             quantities:
-              precursor_deposition_method:
+              method:
                 type: str
                 m_annotations:
                   eln:
@@ -94,11 +102,13 @@
               chemical_formula:
                 type: str
                 description: |+
-                  Chemical formula stating the precursor layer composition.
+                  Chemical formula stating the precursor layer composition. It can also be a single layer of a metal stack
                 m_annotations:
                   eln:
                     component: StringEditQuantity
               layer_thickness:
+                description: |+
+                  in a metal stack the thickness of the layers will yield the precursor composition
                 type: np.float64
                 unit: nm
                 m_annotations:
@@ -129,6 +139,10 @@
             # formulae represetantions. The rule here is to introduce formulas which are
             # valid for pymatgen.core.composition. For example, Cu2Zn(Sn0.2Ga0.8)(S0.25Se0.75)4 will
             # be recognise, but Cu2Zn(Sn,Ga)(S,Se)4 will not work out because of the commas.
+            description: |  
+                  Description of Absorber layer: composition, type, and additives such as  Na, small amounts of Ge or similar
+                  (if these cannot be included in the chemical formula specifying the composition)
+            
             base_sections: 
               - nomad.datamodel.metainfo.eln.Chemical
             m_annotations:
@@ -172,9 +186,10 @@
                           - RBS
               additives:
                 type: str
-                description: |+
-                  Chemical formula of the additive or dopant in the absorber layer
                 shape: '*'
+                description: |+
+                  Chemical formula of the additive or dopant in the absorber layer (e.g. Na, Ge, Ag), if these quantities 
+                  are too small to appear in the chemical formula
                 m_annotations:
                   eln:
                       component: EnumEditQuantity
@@ -187,6 +202,10 @@
                           - KF
         absorber_chalcogenization:
           section:
+            description: |  
+                This section describes the chalcogenization process, including details about the setup,
+                type of Chalcogen used, Temperature ramps and holding times; Cooling down can be entered 
+                as negative temperature ramp
             base_sections: 
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection        
             m_annotations:
@@ -195,7 +214,7 @@
             quantities: 
               type_of_setup:
                 description: |
-                              Type of machine in which the chalcogenization is conducted.
+                      Type of machine in which the chalcogenization is conducted.
                 type:
                   type_kind: Enum
                   type_data:
@@ -208,7 +227,7 @@
                     component: RadioEnumEditQuantity
               recipient_material:
                 description: |
-                              Material of the recipient in which the chalcogenization is conducted.
+                              Material of the recipient in which the chalcogenization takes place.
                 type:
                   type_kind: Enum
                   type_data:
@@ -219,7 +238,7 @@
                     component: RadioEnumEditQuantity
               recipient_mass:
                 description: |
-                                Mass of the recipient in which the chalcogenization is conducted.
+                                Mass of the recipient in which the chalcogenization takes place.
                 type: np.float64
                 unit: g
                 m_annotations:
@@ -305,7 +324,7 @@
                   quantities:
                     temperature:
                       description: |
-                                      Final temperature of that step.
+                                      Target temperature of this specific annealing step.
                       type: np.float64
                       unit: °C
                       m_annotations:
@@ -314,7 +333,7 @@
                           defaultDisplayUnit: "°C"
                     dwell_time:
                       description: |
-                                      Time spent at the given temperature after reaching it.
+                                      Time duration at the given temperature after reaching it.
                       type: np.float64
                       unit: minute
                       m_annotations:
@@ -361,6 +380,8 @@
                           component: NumberEditQuantity
         absorber_etching:
           section:
+            description: |  
+                This section describes possible etching treatments to the absorber after chalcogenization.  Use freetext section cautiously
             base_sections: 
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection       
             m_annotations:
@@ -413,6 +434,8 @@
         post_annealing:
           repeats: true
           section:
+            description: |  
+                This section describes possible post annealing steps
             base_sections: 
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
             m_annotations:
@@ -442,7 +465,7 @@
                     defaultDisplayUnit: "°C"
               annealing_dwell_time:
                 description: |
-                                Time spent at the given temperature after reaching it.
+                                Time duration at the given temperature after reaching it.
                 type: np.float64
                 unit: minute
                 m_annotations:
@@ -494,6 +517,8 @@
                 default: Post Annealing
         optoelectronic_properties:
           section:
+            description: |  
+                This section describes some main optoelectronic properties. 
             base_sections:
               - 'nomad.datamodel.metainfo.eln.SolarCellBaseSectionWithOptoelectronicProperties'
             quantities:
@@ -551,7 +576,7 @@
               PLQY:
                 type: np.float64
                 description: |
-                        Photoluminescence Quantum Yield.
+                        Photoluminescence Quantum Yield (Range 0 to 1, do not use percent)
                 m_annotations:
                   eln:
                     component: NumberEditQuantity
@@ -613,6 +638,8 @@
             m_annotations:
               eln: 
                 hide: ['name', 'lab_id', 'description', 'stack_sequence']
+            description: |  
+                Basic definition of the solar, junction type, layer stack 
             base_sections: 
               - nomad.datamodel.metainfo.eln.SolarCellDefinition
             quantities:
@@ -675,11 +702,11 @@
                               - Solution based
         solar_cell_JV:
           section:
+            description: |  
+                Current-Voltage Data and main results; datafile can be dropped and will be displayed
             base_sections: 
-              # - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
               - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
-              # - nomad.datamodel.metainfo.eln.SolarCellDefinition
               - 'nomad.parsing.tabular.TableData'
             m_annotations:
               eln:
@@ -744,6 +771,10 @@
                 default: Current-Voltage Scan (JV)
         solar_cell_EQE:
           section:
+            description: |  
+                External quantum efficiency results. Datafile can be dropped and will be displayed.
+                Some calculations will be rperformed based on the EQE according to an adapted procedure described by
+                [Krückemeier et al.](https://doi.org/10.1002/aenm.201902573)
             base_sections:
               - nomad.datamodel.metainfo.eln.SolarCellEQE
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
