@@ -705,10 +705,8 @@
             description: |  
                 Current-Voltage Data and main results; datafile can be dropped and will be displayed
             base_sections: 
-              # - nomad.datamodel.metainfo.eln.perovskite_solar_cell_database.Module
               - 'nomad.datamodel.metainfo.eln.SolarCellJVCurve'
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
-              # - nomad.datamodel.metainfo.eln.SolarCellDefinition
               - 'nomad.parsing.tabular.TableData'
             m_annotations:
               eln:
@@ -774,7 +772,9 @@
         solar_cell_EQE:
           section:
             description: |  
-                External quantum efficiency results. Datafile can be dropped and will be displayed
+                External quantum efficiency results. Datafile can be dropped and will be displayed.
+                Some calculations will be rperformed based on the EQE according to an adapted procedure described by
+                [Krückemeier et al.](https://doi.org/10.1002/aenm.201902573)
             base_sections:
               - nomad.datamodel.metainfo.eln.SolarCellEQE
               - nomad.datamodel.metainfo.eln.ElnActivityBaseSection
