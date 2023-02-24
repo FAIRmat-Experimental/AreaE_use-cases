@@ -116,7 +116,7 @@ definitions:
               eln:
                 overview: true
               plot:
-                title: Extenral quantum efficiency (EQE)
+                title: External quantum efficiency (EQE)
                 x: raw_wavelength_array
                 y: raw_eqe_array
         absorber_layer:
